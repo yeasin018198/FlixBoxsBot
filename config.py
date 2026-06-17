@@ -43,15 +43,15 @@ WEB_URL = "gorgeous-ashla-ctgnahid-3b872c36.koyeb.app"  # Koyeb অ্যাপ�
 
 # আপনার আয়ের ডিরেক্ট অ্যাড লিংকসমূহ (Adsterra এবং OMG10)
 DIRECT_AD_LINKS = [
-    "https://www.effectivecpmnetwork.com/p4bm30ss3?key=8bb102e9258871570c79a9a90fa3cf9f",
-    "https://www.effectivecpmnetwork.com/q5cpmxwy44?key=075b9f116b4174922cadfae2d3291743",
-    "https://www.effectivecpmnetwork.com/c90zejmfrg?key=45a67d2f1523ee6b3988c4cc8f764a35",
-    "https://www.effectivecpmnetwork.com/a37vi5p8z?key=921db14d454c2b0e780ab51966b651a6",
-    "https://www.effectivecpmnetwork.com/m30pd1efbm?key=e7b1df640000086bd44393a929d6ebab",
-    "https://www.effectivecpmnetwork.com/jxuaz5zk?key=6faf197d33f98bcb3bc070b020c19664",
-    "https://omg10.com/4/10136724",
-    "https://omg10.com/4/10395944",
-    "https://omg10.com/4/11063339"
+    "https://www.effectivecpmnetwork.com/wsck7gj1?key=2f49c16a80560c9b810503b65da32363",
+    "https://www.effectivecpmnetwork.com/iqs1w6v06c?key=19b65cbb2964d6f0a3c934b5ee855f18",
+    "https://www.effectivecpmnetwork.com/tpxm5krbv?key=a9a3e08835e93a54ffdaad1597bfe6cb",
+    "https://www.effectivecpmnetwork.com/vrstnq7p2s?key=257dbfc9920ae1f06a0a7b33cbeb410d",
+    "https://www.effectivecpmnetwork.com/qw8kn1x7h?key=5fdb7c5ecd8aff08f9ffb43334a9d3e6",
+    "https://www.effectivecpmnetwork.com/xqmb731x1?key=0267816362fc4320de630e064b317db1",
+    "https://omg10.com/4/10357652",
+    "https://omg10.com/4/10488925",
+    "https://omg10.com/4/10586806"
 ]
 
 # --- বাটনগুলোর জন্য নিজস্ব প্রমোショナル ও সোশ্যাল লিংকসমূহ ---
