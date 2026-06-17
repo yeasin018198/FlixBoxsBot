@@ -3,8 +3,8 @@ import os
 from pyrogram import filters
 
 # --- বটের প্রধান এপিআই ক্রেডেনশিয়ালস ---
-API_ID = 29738          # আপনার Telegram API ID (integer)
-API_HASH = "297f520a09e80273628c3c24"  # আপনার Telegram API Hash (string)
+API_ID = 29904834          # আপনার Telegram API ID (integer)
+API_HASH = "8b4fd9ef578af114502feeafa2d31938"  # আপনার Telegram API Hash (string)
 BOT_TOKEN = "8873890756:AAE49O2dNrE94CN0m9FUce7Om1dmDin9cpE"  # BotFather থেকে পাওয়া টোকেন
 
 # --- এডমিন কনফিগারেশন (মাল্টিপল এডমিন সাপোর্ট) ---
