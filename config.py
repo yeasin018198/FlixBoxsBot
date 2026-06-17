@@ -39,7 +39,7 @@ DB_LIMIT_MB = 300
 
 # --- আর্নিং ও মিনি অ্যাপ কনফিগারেশন ---
 BOT_USERNAME = "FlixBoxsBot"  # বটের ইউজারনেম ( শুরুতে @ দেবেন না)
-WEB_URL = "gorgeous-ashla-ctgnahid-3b872c36.koyeb.app"  # Koyeb অ্যাপের লিংক ( শুরুতে https:// দেবেন না)
+WEB_URL = "homely-reyna-yeasinvai-768b2ae0.koyeb.app"  # Koyeb অ্যাপের লিংক ( শুরুতে https:// দেবেন না)
 
 # আপনার আয়ের ডিরেক্ট অ্যাড লিংকসমূহ (Adsterra এবং OMG10)
 DIRECT_AD_LINKS = [
