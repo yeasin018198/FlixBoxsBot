@@ -250,12 +250,12 @@ async def main_handler(client: Client, message: Message):
                                 f"├─ 🍿 [All Movies Channel]({config.CHANNEL_LINK_1})\n"
                                 f"├─ 📢 [Backup Channel]({config.CHANNEL_LINK_2})\n"
                                 f"└─ 💬 [Movie Request Group]({config.GROUP_LINK})\n\n"
-                                f"👨‍💻 *Power and Branded by CTG Network Team*\n\n"
+                                f"👨‍💻 *Power and Branded by FlixBoxs Network Team*\n\n"
                                 f"⚠️ **⚠️ ꜱᴇᴄᴜʀɪᴛʏ ᴀʟᴇʀᴛ:**\n"
                                 f"কপিরাইট এড়াতে এই ফাইলটি আগামী **৫ মিনিট** পর চ্যাট থেকে স্বয়ংক্রিয়ভাবে মুছে যাবে। তাই দ্রুত ফাইলটি আপনার **Saved Messages**-এ ফরোয়ার্ড করে রাখুন।"
                             )
                             
-                            bot_username = getattr(config, "BOT_USERNAME", "CTGMovieBot")
+                            bot_username = getattr(config, "BOT_USERNAME", "FlixBoxsBot")
                             share_text = f"🍿 Get '{cleaned_name}' movie instantly from this bot!"
                             encoded_share_text = urllib.parse.quote(share_text)
                             share_url = f"https://t.me/share/url?url=https://t.me/{bot_username}?start=get_{file_db_id}&text={encoded_share_text}"
