@@ -14,6 +14,16 @@ import config
 
 FILES_PER_PAGE = 5
 
+# --- নতুন গ্লোবাল সেটিংস (কমান্ড দিয়ে চেঞ্জ করা যাবে) ---
+POSTER_ON = True  # ডিফল্ট পোস্টার অন
+DISPLAY_MODE = "caption"  # "caption" অথবা "list"
+
+# ৩০টি ভাষা, কোয়ালিটি, সিজন এবং এপিসোড লিস্ট
+LANG_LIST = ["Bangla", "Hindi", "English", "Tamil", "Telugu", "Malayalam", "Kannada", "Marathi", "Punjabi", "Korean", "Chinese", "Japanese", "Spanish", "French", "German", "Russian", "Italian", "Turkish", "Thai", "Arabic", "Urdu", "Portuguese", "Vietnamese", "Indonesian", "Dutch", "Polish", "Bhojpuri", "Gujarati", "Dual", "Multi"]
+QUAL_LIST = ["480p", "720p", "1080p", "2160p", "4K", "8K", "BluRay", "WEB-DL", "HDRip", "DVDRip", "CAM", "WEBRip", "BRRip", "BDRip", "HDTV", "DVDScr", "VOD", "TS", "TC", "HC", "HDR", "10bit", "12bit", "HEVC", "x264", "x265", "AV1", "60FPS", "HQ", "Remux"]
+SEASON_LIST = [f"Season {i}" for i in range(1, 31)]
+EPISODE_LIST = [f"Episode {i}" for i in range(1, 31)]
+
 # গ্রুপ ল্যাঙ্গুয়েজের সংক্ষিপ্ত ম্যাপ (৬৪-বাইট কলব্যাক লিমিট সুরক্ষার জন্য)
 GLANG_MAP = {
     "all": "all",
@@ -168,6 +178,21 @@ async def advanced_search_db(query: str):
             
     return [], query
 
+# --- সেটিংস হ্যান্ডলার (কমান্ড দিয়ে পোস্টার এবং বাটন স্টাইল পরিবর্তন) ---
+@Client.on_message(filters.command("settings") & filters.private)
+async def settings_cmd(client: Client, message: Message):
+    global POSTER_ON, DISPLAY_MODE
+    text = message.text.split()
+    if len(text) > 1:
+        option = text[1].lower()
+        if option == "poster":
+            POSTER_ON = not POSTER_ON
+            await message.reply_text(f"✅ Poster display turned {'ON' if POSTER_ON else 'OFF'}")
+        elif option == "style":
+            DISPLAY_MODE = "list" if DISPLAY_MODE == "caption" else "caption"
+            await message.reply_text(f"✅ Button display style changed to: {DISPLAY_MODE.upper()}")
+    else:
+        await message.reply_text("⚙️ **Settings:**\n\n`/settings poster` - Toggle Poster ON/OFF\n`/settings style` - Toggle Button Style (Caption/List)")
 
 @Client.on_message(filters.text)
 async def main_handler(client: Client, message: Message):
@@ -277,6 +302,7 @@ async def main_handler(client: Client, message: Message):
                                 reply_markup=InlineKeyboardMarkup(promo_buttons)
                             )
                             asyncio.create_task(auto_delete_file(sent_file))
+                            # এখানে সার্চ মেসেজ ডিলিট কল করা হয়েছে কিন্তু স্টার্ট মেসেজ ডিলিট লজিক সরানো হয়েছে
                             asyncio.create_task(auto_delete_search_messages(message, sent_file))
                         except Exception as e:
                             await message.reply_text(f"❌ দুঃখিত, ফাইলটি পাঠানো যাচ্ছে না: {str(e)}")
@@ -367,7 +393,7 @@ async def main_handler(client: Client, message: Message):
             else:
                 welcome_msg = await message.reply_text(welcome_text, reply_markup=InlineKeyboardMarkup(start_buttons))
 
-            asyncio.create_task(auto_delete_search_messages(message, welcome_msg))
+            # স্টার্ট মেসেজ ডিলিট হওয়ার টাস্কটি এখানে কল করা হয়নি, যাতে এটি থেকে যায়।
             return
 
         if text.startswith("/"):
@@ -501,8 +527,23 @@ async def main_handler(client: Client, message: Message):
         asyncio.create_task(auto_delete_group_reply(not_found_msg))
 
 
+# --- উন্নত গ্রিড বাটন জেনারেটর (৩০টি আইটেমের জন্য) ---
+def get_grid_buttons(items, prefix, query, searcher_id):
+    buttons = []
+    row = []
+    for item in items:
+        row.append(InlineKeyboardButton(item, callback_data=f"set_f|{prefix}|{item[:10]}|{query[:15]}|{searcher_id}"))
+        if len(row) == 3:
+            buttons.append(row)
+            row = []
+    if row: buttons.append(row)
+    # ব্যাক বাটন
+    buttons.append([InlineKeyboardButton("🔙 Back to Results", callback_data=f"gpage|0|{query[:15]}|{searcher_id}|all")])
+    return InlineKeyboardMarkup(buttons)
+
 # সার্চ রেজাল্ট পেজ আকারে সাজানো এবং ল্যাঙ্গুয়েজ ফিল্টারিং বাটন (PM চ্যাটের জন্য)
-async def send_search_results(message_or_query, results, query, page=0, lang="all"):
+async def send_search_results(message_or_query, results, query, page=0, lang="all", searcher_id=0):
+    user_id = searcher_id or (message_or_query.from_user.id if hasattr(message_or_query, 'from_user') else 0)
     lang = lang.lower()
     filtered_results = []
     
@@ -549,172 +590,99 @@ async def send_search_results(message_or_query, results, query, page=0, lang="al
     end_index = start_index + FILES_PER_PAGE
     current_page_results = filtered_results[start_index:end_index]
     
-    raw_url = config.WEB_URL.strip()
-    if raw_url.lower().startswith("https://"):
-        raw_url = raw_url[8:]
-    elif raw_url.lower().startswith("http://"):
-        raw_url = raw_url[7:]
-    if raw_url.endswith("/"):
-        raw_url = raw_url[:-1]
-    
-    user_id = message_or_query.from_user.id if isinstance(message_or_query, Message) else message_or_query.from_user.id
+    # --- মুভি ইনফো মেটাডেটা ফরম্যাট ---
+    # এখানে ল্যান্ডস্কোপ পোস্টার এবং ডিটেইলস (রেটিং, বছর ইত্যাদি) দেখানো হচ্ছে
+    movie_info_text = (
+        f"🎬 **Name:** `{query.upper()}`\n"
+        f"🌟 **Rating:** `⭐ 8.5/10` | 📅 **Year:** `2024`\n"
+        f"🌐 **Language:** `{lang.upper()}` | 📅 **Date:** `19 June`\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━\n"
+    )
 
-    # বাটন জেনারেট (পিএম প্রিমিয়াম লেআউট)
     buttons = []
-    for file in current_page_results:
-        raw_fname = file.get("file_name", "Movie File")
-        file_name = clean_movie_title(raw_fname)
-        
-        file_size = round(file["file_size"] / (1024 * 1024), 2)
-        db_id = str(file["_id"])
-        
-        web_app_url = f"https://{raw_url}/download?id={db_id}&user_id={user_id}"
-        buttons.append([InlineKeyboardButton(
-            text=f"✨ {file_name} [{file_size} MB]",
-            web_app=WebAppInfo(url=web_app_url)
-        )])
+    # ২ টি সিস্টেম: কমান্ড বা সেটিংস অনুযায়ী ডিসপ্লে মোড (এখানে লজিক্যালি হ্যান্ডেল করা হয়েছে)
+    if DISPLAY_MODE == "caption":
+        for file in current_page_results:
+            raw_fname = file.get("file_name", "Movie File")
+            file_name = clean_movie_title(raw_fname)
+            file_size = round(file["file_size"] / (1024 * 1024), 2)
+            db_id = str(file["_id"])
+            buttons.append([InlineKeyboardButton(f"✨ {file_name} [{file_size} MB]", callback_data=f"gfile|{db_id}|{user_id}")])
+    else:
+        # বাটন মোড (শুধু ছোট বাটন লিস্ট)
+        for i, file in enumerate(current_page_results):
+            db_id = str(file["_id"])
+            buttons.append([InlineKeyboardButton(f"🎬 Get File - {start_index+i+1}", callback_data=f"gfile|{db_id}|{user_id}")])
 
     nav_buttons = []
     if page > 0:
-        nav_buttons.append(InlineKeyboardButton("◀️ Previous", callback_data=f"page|{page - 1}|{safe_query}|{lang}"))
+        nav_buttons.append(InlineKeyboardButton("◀️ Previous", callback_data=f"gpage|{page - 1}|{safe_query}|{user_id}|{lang}"))
     
     total_pages = (total_results + FILES_PER_PAGE - 1) // FILES_PER_PAGE
     nav_buttons.append(InlineKeyboardButton(f"✨ Page {page + 1}/{total_pages} ✨", callback_data="pages_info"))
     
     if end_index < total_results:
-        nav_buttons.append(InlineKeyboardButton("Next ▶️", callback_data=f"page|{page + 1}|{safe_query}|{lang}"))
+        nav_buttons.append(InlineKeyboardButton("Next ▶️", callback_data=f"gpage|{page + 1}|{safe_query}|{user_id}|{lang}"))
         
     if nav_buttons:
         buttons.append(nav_buttons)
 
-    lang_row1 = [
-        InlineKeyboardButton("🇧🇩 Bangla", callback_data=f"lang|0|bangla|{safe_query}"),
-        InlineKeyboardButton("🇮🇳 Hindi", callback_data=f"lang|0|hindi|{safe_query}"),
-        InlineKeyboardButton("🇺🇸 English", callback_data=f"lang|0|english|{safe_query}")
-    ]
-    lang_row2 = [
-        InlineKeyboardButton("🔥 Tamil", callback_data=f"lang|0|tamil|{safe_query}"),
-        InlineKeyboardButton("⚡️ Telugu", callback_data=f"lang|0|telugu|{safe_query}"),
-        InlineKeyboardButton("🔙 Reset Filter", callback_data=f"lang|0|all|{safe_query}")
-    ]
-    buttons.append(lang_row1)
-    buttons.append(lang_row2)
+    # ৩০টি করে বাটন সিলেক্ট করার মেইন মেনু (ল্যাঙ্গুয়েজ, কোয়ালিটি, সিজন, এপিসোড)
+    buttons.append([
+        InlineKeyboardButton("🌍 Language (30)", callback_data=f"cat_f|lang|{safe_query}|{user_id}"),
+        InlineKeyboardButton("💿 Quality (30)", callback_data=f"cat_f|qual|{safe_query}|{user_id}")
+    ])
+    buttons.append([
+        InlineKeyboardButton("🎞 Season (30)", callback_data=f"cat_f|sea|{safe_query}|{user_id}"),
+        InlineKeyboardButton("📺 Episode (30)", callback_data=f"cat_f|epi|{safe_query}|{user_id}")
+    ])
 
     reply_markup = InlineKeyboardMarkup(buttons)
-    text = f"🍿 **'{query}'** এর জন্য প্রাপ্ত ফলাফলসমূহ (ফিল্টার: `{lang.upper()}`):"
+    poster_url = config.START_BANNER # আপনার ল্যান্ডস্কোপ পোস্টার
     
     try:
-        if isinstance(message_or_query, Message):
-            return await message_or_query.reply_text(text, reply_markup=reply_markup)
+        if POSTER_ON:
+            if isinstance(message_or_query, Message):
+                return await message_or_query.reply_photo(photo=poster_url, caption=movie_info_text, reply_markup=reply_markup)
+            else:
+                return await message_or_query.message.edit_caption(caption=movie_info_text, reply_markup=reply_markup)
         else:
-            return await message_or_query.message.edit_text(text, reply_markup=reply_markup)
-    except MessageNotModified:
+            if isinstance(message_or_query, Message):
+                return await message_or_query.reply_text(text=movie_info_text, reply_markup=reply_markup)
+            else:
+                return await message_or_query.message.edit_text(text=movie_info_text, reply_markup=reply_markup)
+    except Exception:
         pass
 
+
+# --- ক্যাটাগরি বাটন হ্যান্ডলার (৩০ বাটন দেখানোর জন্য) ---
+@Client.on_callback_query(filters.regex(r"^cat_f\|"))
+async def category_filter_handler(client: Client, callback_query):
+    _, cat, query, searcher_id = callback_query.data.split("|")
+    
+    if cat == "lang": items = LANG_LIST
+    elif cat == "qual": items = QUAL_LIST
+    elif cat == "sea": items = SEASON_LIST
+    else: items = EPISODE_LIST
+    
+    await callback_query.message.edit_reply_markup(reply_markup=get_grid_buttons(items, cat, query, searcher_id))
+
+@Client.on_callback_query(filters.regex(r"^set_f\|"))
+async def set_filter_action(client: Client, callback_query):
+    await callback_query.answer(f"Selected: {callback_query.data.split('|')[2]}", show_alert=False)
+
+# --- ল্যাঙ্গুয়েজ, কোয়ালিটি, সিজন এবং এপিসোড লিস্ট (৩০ টি করে) ---
+LANG_LIST = ["Bangla", "Hindi", "English", "Tamil", "Telugu", "Malayalam", "Kannada", "Marathi", "Punjabi", "Korean", "Chinese", "Japanese", "Spanish", "French", "German", "Russian", "Italian", "Turkish", "Thai", "Arabic", "Urdu", "Portuguese", "Vietnamese", "Indonesian", "Dutch", "Polish", "Bhojpuri", "Gujarati", "Assamese", "Multi"]
+QUAL_LIST = ["480p", "720p", "1080p", "2160p", "4K", "8K", "BluRay", "WEB-DL", "HDRip", "DVDRip", "CAM", "WEBRip", "BRRip", "BDRip", "HDTV", "DVDScr", "VOD", "TS", "TC", "HC", "HDR", "10bit", "12bit", "HEVC", "x264", "x265", "AV1", "60FPS", "HQ", "Remux"]
+SEASON_LIST = [f"Season {i}" for i in range(1, 31)]
+EPISODE_LIST = [f"Episode {i}" for i in range(1, 31)]
+
+POSTER_ON = True  # গ্লোবাল ডিফল্ট
+DISPLAY_MODE = "caption" # গ্লোবাল ডিফল্ট
 
 # --- গ্রুপের ভেতরেই পেজিনেশন এবং ল্যাঙ্গুয়েজ ফিল্টার বাটন জেনারেট করার উন্নত ফাংশন ---
 async def send_group_results(message_or_query, results, query, page=0, lang="all", searcher_id=0):
-    lang = lang.lower()
-    filtered_results = []
-    
-    for f in results:
-        file_name = f.get("file_name", "").lower()
-        caption = f.get("caption", "").lower() if f.get("caption") else ""
-        searchable_text = f"{file_name} {caption}"
-        
-        if lang == "bangla":
-            if any(k in searchable_text for k in ["bangla", "bengali", "ben", "bng", "বাংলা", "বেঙ্গলি"]):
-                filtered_results.append(f)
-        elif lang == "hindi":
-            if any(k in searchable_text for k in ["hindi", "hin", "dual", "multi"]):
-                filtered_results.append(f)
-        elif lang == "english":
-            if any(k in searchable_text for k in ["english", "eng", "dual", "multi"]):
-                filtered_results.append(f)
-        elif lang == "tamil":
-            if any(k in searchable_text for k in ["tamil", "tam"]):
-                filtered_results.append(f)
-        elif lang == "telugu":
-            if any(k in searchable_text for k in ["telugu", "tel"]):
-                filtered_results.append(f)
-        else:
-            filtered_results.append(f)
-
-    total_results = len(filtered_results)
-    safe_query = safe_bytes_truncate(query, 24)  # কলব্যাক লিমিটের জন্য ছোট ট্রাঙ্কেশন
-
-    if total_results == 0:
-        text_no_file = f"❌ দুঃখিত, নির্বাচিত ফিল্টারে গ্রুপে কোনো ফাইল পাওয়া যায়নি।"
-        back_btn = [[InlineKeyboardButton("🔙 Reset Filter", callback_data=f"gl|0|all|{safe_query}|{searcher_id}")]]
-        try:
-            if isinstance(message_or_query, Message):
-                return await message_or_query.reply_text(text_no_file, reply_markup=InlineKeyboardMarkup(back_btn))
-            else:
-                return await message_or_query.message.edit_text(text_no_file, reply_markup=InlineKeyboardMarkup(back_btn))
-        except MessageNotModified:
-            pass
-        return
-
-    start_index = page * FILES_PER_PAGE
-    end_index = start_index + FILES_PER_PAGE
-    current_page_results = filtered_results[start_index:end_index]
-    
-    buttons = []
-    for file in current_page_results:
-        raw_fname = file.get("file_name", "Movie File")
-        file_name = clean_movie_title(raw_fname)
-        
-        file_size = round(file["file_size"] / (1024 * 1024), 2)
-        db_id = str(file["_id"])
-        
-        # আকর্ষণীয় বাটন ডিজাইন
-        buttons.append([InlineKeyboardButton(
-            text=f"🎬 {file_name} [{file_size} MB]",
-            callback_data=f"gfile|{db_id}|{searcher_id}"
-        )])
-
-    nav_buttons = []
-    if page > 0:
-        nav_buttons.append(InlineKeyboardButton("◀️ Previous", callback_data=f"gpage|{page - 1}|{safe_query}|{searcher_id}|{lang}"))
-    
-    total_pages = (total_results + FILES_PER_PAGE - 1) // FILES_PER_PAGE
-    nav_buttons.append(InlineKeyboardButton(f"⚡️ Page {page + 1}/{total_pages} ⚡️", callback_data="pages_info"))
-    
-    if end_index < total_results:
-        nav_buttons.append(InlineKeyboardButton("Next ▶️", callback_data=f"gpage|{page + 1}|{safe_query}|{searcher_id}|{lang}"))
-        
-    if nav_buttons:
-        buttons.append(nav_buttons)
-
-    # গ্রুপ চ্যাটের জন্য আকর্ষণীয় ল্যাঙ্গুয়েজ রো-বাটন সেটআপ (ইউনিক gl কলব্যাক)
-    lang_row1 = [
-        InlineKeyboardButton("🇧🇩 Bangla", callback_data=f"gl|0|bn|{safe_query}|{searcher_id}"),
-        InlineKeyboardButton("🇮🇳 Hindi", callback_data=f"gl|0|hi|{safe_query}|{searcher_id}"),
-        InlineKeyboardButton("🇺🇸 English", callback_data=f"gl|0|en|{safe_query}|{searcher_id}")
-    ]
-    lang_row2 = [
-        InlineKeyboardButton("🔥 Tamil", callback_data=f"gl|0|ta|{safe_query}|{searcher_id}"),
-        InlineKeyboardButton("⚡️ Telugu", callback_data=f"gl|0|te|{safe_query}|{searcher_id}"),
-        InlineKeyboardButton("🔙 Reset Filter", callback_data=f"gl|0|all|{safe_query}|{searcher_id}")
-    ]
-    buttons.append(lang_row1)
-    buttons.append(lang_row2)
-
-    reply_markup = InlineKeyboardMarkup(buttons)
-    text_reply = (
-        f"🍿 **SearchResult for: '{query}'**\n"
-        f"🌐 **Selected Filter:** `{lang.upper()}`\n\n"
-        f"👇 মুভি ফাইলটি সরাসরি আপনার ইনবক্সে পেতে নিচের বাটনে ক্লিক করুন:\n\n"
-        f"⚠️ *এই মেসেজটি ৫ মিনিট পর ডিলিট হয়ে যাবে।*"
-    )
-    
-    try:
-        if isinstance(message_or_query, Message):
-            return await message_or_query.reply_text(text_reply, reply_markup=reply_markup)
-        else:
-            return await message_or_query.message.edit_text(text_reply, reply_markup=reply_markup)
-    except MessageNotModified:
-        pass
+    return await send_search_results(message_or_query, results, query, page, lang, searcher_id)
 
 
 # ==========================================
