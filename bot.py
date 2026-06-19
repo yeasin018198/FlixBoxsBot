@@ -498,130 +498,107 @@ HTML_STREAM_TEMPLATE = Template("""
             background-color: #0b0c10;
             color: #ffffff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            padding: 15px;
+            padding: 10px;
             margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 95vh;
         }
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background: rgba(30, 30, 38, 0.65);
-            padding: 25px 15px;
-            border-radius: 24px;
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 240, 255, 0.4);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-            text-align: center;
-        }
-        h2 { 
-            color: #00f0ff; 
-            margin: 0 0 15px 0; 
-            font-size: 24px; 
-            font-weight: 800;
-            text-transform: uppercase;
-            text-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
-        }
-        .video-player-box {
-            width: 100%;
-            background: #000;
-            border-radius: 14px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
-            aspect-ratio: 16/9;
-        }
-        video {
-            width: 100%;
-            height: 100%;
-        }
-        .info-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 14px;
-            padding: 12px;
-            margin-bottom: 20px;
-            text-align: left;
-            font-size: 13px;
-        }
-        .file-title {
-            color: #00ff88;
-            font-weight: bold;
-            word-break: break-all;
-        }
-        .btn-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .btn {
-            padding: 12px 10px;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            text-decoration: none;
-            color: white;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-        .btn-vlc { background: #e65c00; }
-        .btn-mx { background: #0080ff; }
-        .btn-playit { background: #33cc33; }
-        .btn-close { background: #374151; grid-column: span 2; }
-        .btn:hover { transform: scale(1.02); filter: brightness(1.1); }
-        .note {
-            font-size: 11px;
-            color: #9ca3af;
-            line-height: 1.4;
-        }
-    </style>
-    <script>
-        let tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
+        .container { width: 100%; max-width: 500px; margin: auto; }
         
-        function closeApp() {
-            tg.close();
+        .top-bar {
+            display: flex; justify-content: space-between; padding: 10px 5px;
+            font-weight: bold; font-size: 14px;
         }
-    </script>
+        .size-info { color: #4ade80; }
+        .time-info { color: #94a3af; }
+
+        .video-player-box {
+            width: 100%; background: #000; border-radius: 12px;
+            overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px; aspect-ratio: 16/9;
+        }
+        video { width: 100%; height: 100%; }
+
+        .main-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .btn-main {
+            padding: 15px; border-radius: 50px; text-decoration: none; color: white;
+            font-weight: bold; font-size: 13px; text-align: center;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-download { background: #e91e63; }
+        .btn-watch { background: #2962ff; }
+
+        .player-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .btn-player {
+            background: #1c2230; color: #fff; padding: 12px; border-radius: 30px;
+            text-decoration: none; font-size: 13px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            border: 1px solid #2a3245;
+        }
+        
+        .small-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .btn-sm { padding: 10px; font-size: 11px; }
+
+        .btn-close { background: #1c2230; margin-top: 15px; width: 100%; padding: 12px; border-radius: 10px; color: #9ca3af; border: none; font-weight: bold; cursor: pointer; }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h2>👑 VIP Streaming Player</h2>
-        
+        <div class="top-bar">
+            <span class="size-info">SIZE: $file_size MB</span>
+            <span class="time-info" id="current-time">TIME: 00:00:00 PM</span>
+        </div>
+
         <div class="video-player-box">
-            <!-- HTML5 Player (MP4 ফাইল সরাসরি প্লে হবে) -->
             <video controls poster="https://github.com/NBBotz/Images/blob/main/Lucia-Filter-Bot.jpeg?raw=true">
                 <source src="$stream_url" type="video/mp4">
                 Your browser does not support HTML5 video streaming.
             </video>
         </div>
-        
-        <div class="info-card">
-            <div>🎬 <span class="file-title">$file_name</span></div>
-            <div style="margin-top: 5px; color: #9ca3af;">💾 Size: <b>$file_size MB</b> | Status: <b style="color: #00ff88;">VIP Streaming Enabled ⚡️</b></div>
+
+        <div class="main-btn-grid">
+            <a href="$stream_url" download class="btn-main btn-download">⚡ DOWNLOAD</a>
+            <a href="$stream_url" class="btn-main btn-watch">📂 WATCH ONLINE</a>
         </div>
-        
-        <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px; color: #00f0ff;">👉 ব্রাউজারে প্লে না হলে বা MKV/অডিও সমস্যা হলে নিচের প্লেয়ারে ওপেন করুন:</div>
-        
-        <div class="btn-grid">
-            <a href="vlc://$stream_url" class="btn btn-vlc">🧡 Open in VLC</a>
-            <a href="intent:$stream_url#Intent;package=com.mxtech.videoplayer.ad;S.title=$file_name;end" class="btn btn-mx">💙 Open in MX Player</a>
-            <a href="intent:$stream_url#Intent;package=com.player.videoplayer;S.title=$file_name;end" class="btn btn-playit">💚 Open in Playit</a>
-            <button class="btn btn-close" onclick="closeApp()">🛑 Close Player</button>
+
+        <div class="player-grid">
+            <a href="intent:$stream_url#Intent;package=org.videolan.vlc;type=video/*;end" class="btn-player">
+                <span style="color:orange">🧡</span> VLC PLAYER
+            </a>
+            <a href="intent:$stream_url#Intent;package=com.mxtech.videoplayer.ad;S.title=$file_name;end" class="btn-player">
+                <span style="color:#0080ff">💙</span> MX PLAYER
+            </a>
+            <a href="intent:$stream_url#Intent;package=com.player.videoplayer;S.title=$file_name;end" class="btn-player">
+                <span style="color:#33cc33">💚</span> PLAYIT
+            </a>
+            <a href="intent:$stream_url#Intent;action=android.intent.action.VIEW;type=video/*;end" class="btn-player">
+                <span style="color:yellow">📺</span> SYSTEM
+            </a>
         </div>
-        
-        <div class="note">
-            ⚠️ <b>পরামর্শ:</b> MKV ফাইল বা ডুয়াল অডিও মুভিগুলো নির্বিঘ্নে দেখতে এবং বাংলা সাবটাইটেল সাপোর্ট করতে <b>VLC Player</b> অথবা <b>MX Player</b> ব্যবহার করুন।
+
+        <div class="small-row">
+            <a href="intent:$stream_url#Intent;package=com.kmplayer;end" class="btn-player btn-sm">
+                <span style="color:#a855f7">🎬</span> KM PLAYER
+            </a>
+            <a href="intent:$stream_url#Intent;package=org.xbmc.kodi;end" class="btn-player btn-sm">
+                <span style="color:#3b82f6">🏢</span> KODI
+            </a>
+            <a href="nplayer-$stream_url" class="btn-player btn-sm">
+                <span style="color:#22d3ee">📱</span> NPLAYER
+            </a>
         </div>
+
+        <button class="btn-close" onclick="tg.close()">🛑 CLOSE PLAYER</button>
     </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.ready(); tg.expand();
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').innerText = "TIME: " + now.toLocaleTimeString();
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
 </body>
 </html>
 """)
