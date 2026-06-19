@@ -313,7 +313,7 @@ async def main_handler(client: Client, message: Message):
 
             welcome_text = (
                 f"👋 **Hey {message.from_user.mention}** 🍿\n\n"
-                f"I Am **CTG Movie Search Bot (Tier-1 Premium Edition)**\n"
+                f"I Am **FlixBoxs Movie Search Bot (Tier-1 Premium Edition)**\n"
                 f"I can find your favorite Movies, Series, Animes, and other files instantly!\n\n"
                 f"━━━━━━━━━━━━━━━━━━━━━━\n"
                 f"🔍 **মুভি খোঁজার নিয়ম:**\n"
