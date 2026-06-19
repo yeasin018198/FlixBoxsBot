@@ -294,7 +294,7 @@ async def auto_channel_post_handler(client: Client, message: Message):
     cleaned_title = advanced_clean_title(file_name)
     season, episode = parse_season_episode(file_name)
     movie_meta = await fetch_tmdb_metadata(file_name)
-    bot_username = getattr(config, "BOT_USERNAME", "CTGMovieBot")
+    bot_username = getattr(config, "BOT_USERNAME", "FlixBoxsBot")
     
     # ল্যাঙ্গুয়েজ নির্ধারণ
     tmdb_lang_code = movie_meta.get("original_language") if movie_meta else None
