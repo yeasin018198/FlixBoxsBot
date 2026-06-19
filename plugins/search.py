@@ -797,7 +797,7 @@ async def group_file_click_handler(client: Client, callback_query):
 @Client.on_callback_query(filters.regex(r"^premium_info$"))
 async def premium_info_click_handler(client: Client, callback_query):
     premium_text = (
-        "👑 **𝗖𝗧𝗚 𝗠𝗢𝗩𝗜𝗘 𝗣𝗥𝗘𝗠𝗜𝗨𝗠 𝗠𝗘𝗠𝗕𝗘𝗥𝗦𝗛𝗜package** 👑\n\n"
+        "👑 **FlixBoxs 𝗠𝗢𝗩𝗜𝗘 𝗣𝗥𝗘𝗠𝗜𝗨𝗠 𝗠𝗘𝗠𝗕𝗘𝗥𝗦𝗛𝗜package** 👑\n\n"
         "কোনো শর্টলিংক বা বিজ্ঞাপন ছাড়াই সরাসরি ফাইল এবং আল্ট্রা-স্পিড ডাউনলোড সুবিধা পেতে আজই ভিআইপি মেম্বারশিপ গ্রহণ করুন!\n\n"
         "✨ **মেম্বারদের বিশেষ সুবিধাসমূহ:**\n"
         "━━━━━━━━━━━━━━━━━━━━━━\n"
@@ -821,7 +821,7 @@ async def premium_info_click_handler(client: Client, callback_query):
 async def start_back_handler(client: Client, callback_query):
     welcome_text = (
         f"👋 **Hey {callback_query.from_user.mention}** 🍿\n\n"
-        f"I Am **CTG Movie Search Bot (Tier-1 Premium Edition)**\n"
+        f"I Am **@FlixBoxs Movie Search Bot (Tier-1 Premium Edition)**\n"
         f"I can find your favorite Movies, Series, Animes, and other files instantly!\n\n"
         f"━━━━━━━━━━━━━━━━━━━━━━\n"
         f"🔍 **মুভি খোঁজার নিয়ম:**\n"
