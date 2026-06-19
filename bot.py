@@ -277,7 +277,7 @@ HTML_TEMPLATE = Template("""
     </div>
 
     <div id="app-content" class="container" style="display: none;">
-        <h2>CTG PREMIUM SEARCH</h2>
+        <h2>FlixBoxs PREMIUM SEARCH</h2>
         
         <div class="info-card">
             <div class="info-row">
@@ -468,7 +468,7 @@ HTML_VIP_TEMPLATE = Template("""
 <body>
     <div class="container">
         <div class="vip-badge">👑 VIP Premium Active</div>
-        <h2>CTG VIP MOVIE PANEL</h2>
+        <h2>FlixBoxs VIP MOVIE PANEL</h2>
         
         <div class="info-card">
             <div class="info-title">🎬 $file_name</div>
