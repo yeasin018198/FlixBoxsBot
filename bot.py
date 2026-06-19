@@ -483,118 +483,131 @@ HTML_VIP_TEMPLATE = Template("""
 </html>
 """)
 
-# ৩. প্রিমিয়াম স্ট্রিমিং প্লেয়ার ওয়েব পেজ টেমপ্লেট (ছবি এবং আপনার রিকোয়ারমেন্ট অনুযায়ী আপডেট করা)
+# ৩. প্রিমিয়াম স্ট্রিমিং প্লেয়ার ওয়েব পেজ টেমপ্লেট (সংশোধিত এরর-ফ্রি ডিজাইন)
 HTML_STREAM_TEMPLATE = Template("""
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIP Search Stream</title>
+    <title>VIP SEARCH BOT - Player</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background-color: #0b0f19; color: #ffffff; font-family: sans-serif; padding: 10px; margin: 0; transition: background 0.3s; overflow-x: hidden; }
-        body.light-mode { background-color: #ffffff; color: #111; }
+        body { background-color: #0b0f19; color: #ffffff; font-family: sans-serif; padding: 10px; margin: 0; }
         .container { width: 100%; max-width: 500px; margin: auto; }
         
-        .header-stats { display: flex; justify-content: space-between; padding: 8px; font-weight: bold; font-size: 14px; color: #4ade80; }
-        
-        .video-box { position: relative; width: 100%; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 10px; aspect-ratio: 16/9; border: 1px solid #1e293b; }
-        video { width: 100%; height: 100%; }
-        #bright-layer { position: absolute; top:0; left:0; width:100%; height:100%; background:black; opacity:0; pointer-events:none; }
+        .header-info { display: flex; justify-content: space-between; padding: 10px 5px; font-weight: bold; font-size: 13px; text-transform: uppercase; }
+        .size-green { color: #4ade80; }
+        .time-white { color: #fff; }
 
-        .movie-title { font-weight: bold; font-size: 15px; color: #00f0ff; text-align: left; padding: 8px; margin-bottom: 15px; border-left: 4px solid #e91e63; word-break: break-all; }
+        .player-box { position: relative; width: 100%; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 15px; aspect-ratio: 16/9; border: 1px solid #1e293b; }
+        video { width: 100%; height: 100%; }
+        #brightness-layer { position: absolute; top:0; left:0; width:100%; height:100%; background:black; opacity:0; pointer-events:none; }
+
+        .title-display { font-weight: bold; font-size: 14px; color: #00f0ff; padding: 8px; margin-bottom: 15px; border-left: 4px solid #e91e63; word-break: break-all; background: rgba(255,255,255,0.03); }
         
         .custom-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; }
         .ctrl-box { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #94a3b8; }
         .ctrl-box select, .ctrl-box input { background: #1e293b; color: #fff; border: 1px solid #334155; border-radius: 5px; width: 100%; padding: 4px; margin-top: 5px; font-size: 11px; }
 
-        .main-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .btn-main { padding: 16px; border-radius: 50px; text-decoration: none; color: white; font-weight: bold; font-size: 14px; text-align: center; }
-        .btn-down-red { background: #e11d48; box-shadow: 0 4px 10px rgba(225,29,72,0.3); }
-        .btn-watch-blue { background: #2563eb; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
+        .action-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .btn-act { padding: 16px; border-radius: 50px; text-decoration: none; color: white; font-weight: bold; font-size: 13px; text-align: center; }
+        .btn-red { background: #e11d48; }
+        .btn-blue { background: #2563eb; }
 
-        .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .btn-app { background: #1c2230; color: #fff; padding: 14px; border-radius: 35px; text-decoration: none; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid #2a3245; }
+        .grid-apps { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .btn-app { background: #1c2230; color: #fff; padding: 14px; border-radius: 35px; text-decoration: none; font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #2a3245; cursor: pointer; }
         
-        .bottom-apps { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .btn-app-sm { padding: 12px; font-size: 11px; }
+        .small-apps { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .btn-mini { padding: 12px; font-size: 10px; border-radius: 12px; }
 
-        .get-file-btn { background: #00ff88; color: #000; width: 100%; padding: 15px; border-radius: 12px; font-weight: 900; border: none; margin-bottom: 10px; cursor: pointer; }
-        .btn-close-app { background: #1e293b; width: 100%; padding: 13px; border-radius: 12px; color: #ef4444; border: none; font-weight: bold; cursor: pointer; }
+        .btn-get-file { background: #00ff88; color: #000; width: 100%; padding: 15px; border-radius: 12px; font-weight: 900; border: none; margin-bottom: 10px; cursor: pointer; text-transform: uppercase; }
+        .btn-close-p { background: #1e293b; width: 100%; padding: 13px; border-radius: 12px; color: #ef4444; border: none; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header-stats">
-            <span>SIZE: $file_size MB</span>
-            <span id="timer">TIME: 00:00:00 PM</span>
+        <div class="header-info">
+            <span class="size-green">SIZE: $file_size MB</span>
+            <span class="time-white" id="live-timer">TIME: 00:00:00 PM</span>
         </div>
 
-        <div class="video-box">
-            <div id="bright-layer"></div>
-            <video id="v-player" controls poster="https://github.com/NBBotz/Images/blob/main/Lucia-Filter-Bot.jpeg?raw=true">
+        <div class="player-box">
+            <div id="brightness-layer"></div>
+            <video id="p-main" controls poster="https://github.com/NBBotz/Images/blob/main/Lucia-Filter-Bot.jpeg?raw=true">
                 <source src="$stream_url" type="video/mp4">
             </video>
         </div>
 
-        <div class="movie-title">🎬 $file_name</div>
+        <div class="title-display">🎬 $file_name</div>
 
         <div class="custom-controls">
             <div class="ctrl-box">
                 <span>QUALITY</span>
-                <select onchange="alert('Dynamic quality switching requires HLS. Streaming original file.')">
-                    <option>Auto (1080p/720p)</option>
+                <select id="q-switch">
+                    <option>Auto (High)</option>
                     <option>1080p</option>
                     <option>720p</option>
-                    <option>480p</option>
                 </select>
             </div>
             <div class="ctrl-box">
                 <span>BRIGHTNESS</span>
-                <input type="range" min="0" max="0.7" step="0.1" value="0" oninput="document.getElementById('bright-layer').style.opacity = this.value">
+                <input type="range" min="0" max="0.7" step="0.1" value="0" oninput="document.getElementById('brightness-layer').style.opacity = this.value">
             </div>
             <div class="ctrl-box">
                 <span>SPEED</span>
-                <select onchange="document.getElementById('v-player').playbackRate = this.value">
+                <select onchange="document.getElementById('p-main').playbackRate = this.value">
                     <option value="1">1.0x</option>
-                    <option value="0.5">0.5x</option>
                     <option value="1.5">1.5x</option>
                     <option value="2">2.0x</option>
                 </select>
             </div>
         </div>
 
-        <div class="main-btn-grid">
-            <a href="$stream_url" download class="btn-main btn-down-red">⚡ DOWNLOAD</a>
-            <a href="$stream_url" class="btn-main btn-watch-blue">📂 WATCH ONLINE</a>
+        <div class="action-btns">
+            <!-- সরাসরি ডাউনলোডের জন্য dl=1 প্যারামিটার ফিক্সড -->
+            <a href="$stream_url&dl=1" download class="btn-act btn-red">⚡ DOWNLOAD</a>
+            <a href="$stream_url" class="btn-act btn-blue">📂 WATCH ONLINE</a>
         </div>
 
-        <div class="app-grid">
-            <a href="intent:$stream_url#Intent;package=org.videolan.vlc;type=video/*;end" class="btn-app"><span style="color:orange">🧡</span> VLC PLAYER</a>
-            <a href="intent:$stream_url#Intent;package=com.mxtech.videoplayer.ad;S.title=$file_name;end" class="btn-app"><span style="color:#3b82f6">💙</span> MX PLAYER</a>
-            <a href="intent:$stream_url#Intent;package=com.player.videoplayer;S.title=$file_name;end" class="btn-app"><span style="color:#22c55e">💚</span> PLAYIT</a>
-            <a href="intent:$stream_url#Intent;action=android.intent.action.VIEW;type=video/*;end" class="btn-app"><span style="color:#facc15">📺</span> SYSTEM</a>
+        <div class="grid-apps">
+            <div onclick="openApp('intent:$stream_url#Intent;package=org.videolan.vlc;type=video/*;end')" class="btn-app"><span style="color:orange">🧡</span> VLC PLAYER</div>
+            <div onclick="openApp('intent:$stream_url#Intent;package=com.mxtech.videoplayer.ad;S.title=$file_name;end')" class="btn-app"><span style="color:#3b82f6">💙</span> MX PLAYER</div>
+            <div onclick="openApp('intent:$stream_url#Intent;package=com.player.videoplayer;S.title=$file_name;end')" class="btn-app"><span style="color:#22c55e">💚</span> PLAYIT</div>
+            <div onclick="openApp('intent:$stream_url#Intent;action=android.intent.action.VIEW;type=video/*;end')" class="btn-app"><span style="color:#facc15">📺</span> SYSTEM</div>
         </div>
 
-        <div class="bottom-apps">
-            <a href="intent:$stream_url#Intent;package=com.kmplayer;end" class="btn-app btn-app-sm">🎬 KM PLAYER</a>
-            <a href="intent:$stream_url#Intent;package=org.xbmc.kodi;end" class="btn-app btn-app-sm">🏢 KODI</a>
-            <a href="nplayer-$stream_url" class="btn-app btn-app-sm">📱 NPLAYER</a>
+        <div class="small-apps">
+            <div onclick="openApp('intent:$stream_url#Intent;package=com.kmplayer;end')" class="btn-app btn-mini">🎬 KM PLAYER</div>
+            <div onclick="openApp('intent:$stream_url#Intent;package=org.xbmc.kodi;end')" class="btn-app btn-mini">🏢 KODI</div>
+            <div onclick="openApp('nplayer-$stream_url')" class="btn-app btn-mini">📱 NPLAYER</div>
         </div>
 
-        <button class="get-file-btn" onclick="tg.openTelegramLink('https://t.me/$bot_username?start=get_$file_db_id')">⚡️ GET FILE IN TELEGRAM</button>
-        <button class="btn-close-app" onclick="tg.close()">🛑 CLOSE PLAYER</button>
+        <button class="btn-get-file" onclick="tg.openTelegramLink('https://t.me/$bot_username?start=get_$file_db_id')">⚡️ GET FILE IN TELEGRAM</button>
+        <button class="btn-close-p" onclick="tg.close()">🛑 CLOSE PLAYER</button>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.ready(); tg.expand();
+
+        // এরর মুক্ত উপায়ে এক্সটার্নাল প্লেয়ার ওপেন করার ফাংশন
+        function openApp(url) {
+            tg.openLink(url);
+        }
+
+        // রিয়েল টাইম ক্লক
         function clock() {
             const now = new Date();
-            document.getElementById('timer').innerText = "TIME: " + now.toLocaleTimeString();
+            document.getElementById('live-timer').innerText = "TIME: " + now.toLocaleTimeString();
         }
         setInterval(clock, 1000); clock();
+
+        // ভিডিও ফুল স্ক্রিন হ্যান্ডলার
+        document.getElementById('p-main').addEventListener('dblclick', function() {
+            if (this.requestFullscreen) this.requestFullscreen();
+            else if (this.webkitRequestFullscreen) this.webkitRequestFullscreen();
+        });
     </script>
 </body>
 </html>
@@ -733,6 +746,7 @@ class DummyWebServer(SimpleHTTPRequestHandler):
         elif parsed_url.path == "/stream":
             query_params = parse_qs(parsed_url.query)
             file_db_id = query_params.get("id", [""])[0]
+            is_download = "dl" in query_params # ডাউনলোড ডিটেকশন
             
             file_data = None
             if app.loop and app.loop.is_running():
@@ -775,16 +789,18 @@ class DummyWebServer(SimpleHTTPRequestHandler):
             self.send_header("Accept-Ranges", "bytes")
             self.send_header("Content-Range", f"bytes {start}-{end}/{file_size}")
             self.send_header("Content-Length", str(content_len))
-            # ফোরসড ডাউনলোডের জন্য Content-Disposition: attachment ব্যবহার করা হয়েছে
-            self.send_header("Content-Disposition", f'attachment; filename="{file_data["file_name"]}"')
+            
+            # যদি ডাউনলোড রিকোয়েস্ট হয় তবে attachment হেডার দেওয়া হবে
+            disp = "attachment" if is_download else "inline"
+            self.send_header("Content-Disposition", f'{disp}; filename="{file_data["file_name"]}"')
             self.end_headers()
             
             # ব্যাকগ্রাউন্ডে পাইরোগ্রাম দিয়ে ফাইল চ্যাঙ্ক রিমোটলি রিড করে স্ট্রিম করা হচ্ছে
             if app.loop and app.loop.is_running():
                 async def stream_helper():
                     try:
-                        # ১ এমবি করে চ্যাঙ্ক সাইজ নির্ধারণ (ফাস্ট লোডিংয়ের জন্য)
-                        chunk_size = 1024 * 1024
+                        # স্ট্রিম স্পিড বাড়ানোর জন্য ২ এমবি করে চ্যাঙ্ক সাইজ বাড়ানো হলো
+                        chunk_size = 2048 * 1024 
                         offset_parts = start // chunk_size
                         bytes_to_skip = start % chunk_size
                         bytes_sent = 0
@@ -807,11 +823,10 @@ class DummyWebServer(SimpleHTTPRequestHandler):
                             if bytes_sent >= content_len:
                                 break
                     except Exception:
-                        # কানেকশন ক্লোজ হলে বা ইউজার প্লেয়ার বন্ধ করলে
                         pass
                 
                 future = asyncio.run_coroutine_threadsafe(stream_helper(), app.loop)
-                future.result()  # স্ট্রিম শেষ হওয়া পর্যন্ত ওয়েট করবে
+                future.result() 
         else:
             self.send_response(200)
             self.send_header("Content-type", "text/html")
